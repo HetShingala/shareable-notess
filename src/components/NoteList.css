@@ -1,0 +1,99 @@
+.note-list-container {
+  width: 320px;
+  min-width: 250px;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--sidebar-background);
+  color: var(--sidebar-text);
+}
+.note-list-header {
+  padding: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--sidebar-hover);
+}
+.search-bar {
+  flex-grow: 1;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--sidebar-hover);
+  border-radius: 6px;
+  background-color: var(--sidebar-background);
+  color: var(--sidebar-text);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.search-bar:focus {
+  border-color: var(--accent-primary);
+}
+.new-note-btn {
+  padding: 0.5rem 0.75rem;
+  background-color: var(--accent-primary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.2s;
+}
+.new-note-btn:hover {
+  background-color: var(--accent-primary-hover);
+}
+.notes-scroller {
+  overflow-y: auto;
+  flex-grow: 1;
+}
+.note-item {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--sidebar-hover);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  transition: background-color 0.2s;
+  border-left: 4px solid transparent;
+}
+.note-item:hover {
+  background-color: var(--sidebar-hover);
+}
+.note-item.active {
+  background-color: var(--sidebar-active);
+  border-left-color: var(--accent-primary) !important;
+}
+.note-item-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.delete-note-btn {
+  background: none;
+  border: none;
+  color: var(--sidebar-text);
+  cursor: pointer;
+  visibility: hidden;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+.note-item:hover .delete-note-btn {
+  visibility: visible;
+}
+.delete-note-btn:hover {
+  opacity: 1;
+}
+.no-notes-found {
+  text-align: center;
+  color: var(--text-secondary);
+  padding-top: 2rem;
+}
+/* Sidebar stays fixed with scroll */
+.note-list {
+  height: 100vh;
+  overflow-y: auto;
+  border-right: 1px solid #ddd;
+  padding: 10px;
+}

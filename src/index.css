@@ -1,0 +1,51 @@
+:root{
+  --bg: #f6f7fb;
+  --card: #fff;
+  --accent: #4f46e5;
+  --muted: #6b7280;
+}
+*{box-sizing:border-box}
+body{
+  font-family: Inter, system-ui, Arial, sans-serif;
+  margin:0;background:var(--bg);color:#111;
+}
+.app {
+  display:flex;
+  height:100vh;
+  gap:12px;
+  padding:12px;
+}
+.sidebar {
+  width:320px;
+  max-width:40%;
+}
+.main {
+  flex:1;
+  display:flex;
+  flex-direction:column;
+}
+.header {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:8px;
+}
+.toolbar {
+  display:flex;
+  gap:8px;
+  margin-bottom:8px;
+}
+
+/* small cards */
+.card{
+  background:var(--card);
+  border-radius:10px;
+  padding:10px;
+  box-shadow:0 1px 4px rgba(16,24,40,0.05);
+}
+.search {
+  width:100%;
+  padding:8px;
+  border-radius:8px;
+  border:1px solid #e6e7ee;
+}
