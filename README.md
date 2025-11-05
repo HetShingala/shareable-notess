@@ -6,7 +6,7 @@ This is a browser-based notes application built with **React** and **Vite**, fea
 
 ## Live Demo
 
-**Deployed URL:** [https://shared-notes-app-het.netlify.app/](https://shared-notes-app-het.netlify.app/)
+**Deployed URL:** [[https://shareable-notess.netlify.app](https://shareable-notess.netlify.app/)/]
 
 ---
 
