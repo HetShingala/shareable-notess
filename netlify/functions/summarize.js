@@ -9,7 +9,7 @@ export async function handler(event) {
       "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
     },
     body: JSON.stringify({
-      model: "gemma2-9b-it",
+      model: "openai/gpt-oss-20b",
       messages: [{ role: "user", content: `Summarize this text:\n\n${text}` }],
     }),
   });

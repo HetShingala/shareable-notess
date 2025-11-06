@@ -22,7 +22,7 @@ export async function handler(event) {
 
     if (path.includes("/summarize")) {
       const r = await openaiRequest({
-        model: "gemma2-9b-it",
+        model: "openai/gpt-oss-20b",
         messages: [{ role: "user", content: `Summarize this in 2 lines:\n${text}` }],
         max_tokens: 80,
         temperature: 0.2,
@@ -32,7 +32,7 @@ export async function handler(event) {
 
     else if (path.includes("/tags")) {
       const r = await openaiRequest({
-        model: "gemma2-9b-it",
+        model: "openai/gpt-oss-20b",
         messages: [{ role: "user", content: `Give 3–5 short tags for this note:\n${text}` }],
       });
       const raw = r.choices?.[0]?.message?.content || "";
@@ -41,7 +41,7 @@ export async function handler(event) {
 
     else if (path.includes("/grammar")) {
       const r = await openaiRequest({
-        model: "gemma2-9b-it",
+        model: "openai/gpt-oss-20b",
         messages: [{
           role: "user",
           content: `Find grammar mistakes and return JSON {"issues":[{"text":"...", "suggestion":"..."}]}:\n\n${text}`,
@@ -53,7 +53,7 @@ export async function handler(event) {
 
     else if (path.includes("/glossary")) {
       const r = await openaiRequest({
-        model: "gemma2-9b-it",
+        model: "openai/gpt-oss-20b",
         messages: [{ role: "user", content: `Extract key terms with 1-line definitions:\n${text}` }],
       });
       result = { glossary: r.choices?.[0]?.message?.content };

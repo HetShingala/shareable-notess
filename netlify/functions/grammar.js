@@ -8,7 +8,7 @@ exports.handler = async function(event) {
 
     const OPENAI_KEY = process.env.OPENAI_API_KEY;
     const payload = {
-      model: "gemma2-9b-it",
+      model: "openai/gpt-oss-20b",
       messages: [{
         role: "user",
         content: `Find grammar issues in the text below and return a JSON object like {"issues":[{"text":"...", "suggestion":"..."}]}:\n\n${text}`
