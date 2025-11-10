@@ -31,14 +31,29 @@ export default function NoteList({ notes, activeId, setActiveId, updateNote, del
                 {note.pinned ? "📌" : "📍"}
               </button>
               <button
-                title="Delete"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (confirm("Delete note?")) deleteNote(note.id);
-                }}
-              >
-                🗑
-              </button>
+  title="Delete"
+  onClick={(e) => {
+    e.stopPropagation();
+
+    // 🔒 Prevent deletion of locked/encrypted notes
+    if (note.locked || note.encrypted) {
+      alert("🔒 This note is locked. Please unlock it before deleting.");
+      return;
+    }
+
+    // 🗑 Confirm deletion for unlocked notes
+    if (confirm("Delete note?")) {
+      deleteNote(note.id);
+    }
+  }}
+  style={{
+    opacity: note.locked || note.encrypted ? 0.5 : 1,
+    cursor: note.locked || note.encrypted ? "not-allowed" : "pointer",
+  }}
+>
+  🗑
+</button>
+
             </div>
           </div>
         </div>

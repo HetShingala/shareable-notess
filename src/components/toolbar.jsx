@@ -78,7 +78,25 @@ export default function Toolbar({
         ) : (
           <button className="format-btn" onClick={decryptNote} title="Decrypt Note">🔓</button>
         )}
-        <button className="format-btn" onClick={() => deleteNote(note.id)} title="Delete Note">🗑</button>
+<button
+  className="format-btn"
+  disabled={note.locked || note.encrypted}
+  style={{
+    opacity: note.locked || note.encrypted ? 0.5 : 1,
+    cursor: note.locked || note.encrypted ? "not-allowed" : "pointer",
+  }}
+  onClick={() => {
+    if (note.locked || note.encrypted) {
+      alert("🔒 This note is locked. Please unlock it before deleting.");
+      return;
+    }
+    deleteNote();
+  }}
+  title="Delete Note"
+>
+  🗑
+</button>
+
       </div>
 
       {/* AI Features */}

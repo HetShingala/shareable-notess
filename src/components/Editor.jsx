@@ -15,6 +15,7 @@ import {
 function encryptText(text, password) {
   return CryptoJS.AES.encrypt(text, password).toString();
 }
+
 function decryptText(encrypted, password) {
   try {
     const bytes = CryptoJS.AES.decrypt(encrypted, password);
@@ -40,10 +41,10 @@ export default function Editor({
   const [showPassword, setShowPassword] = useState(false);
   const [saved, setSaved] = useState(true);
   const [shareOpen, setShareOpen] = useState(false);
+  const [aiResult, setAiResult] = useState("");
   const saveTimeout = useRef(null);
-const [aiResult, setAiResult] = useState("");
 
-  // --- Update content ---
+  // --- Update content when switching notes ---
   useEffect(() => {
     if (editorRef.current && note) {
       editorRef.current.innerHTML = note.content || "";
@@ -100,51 +101,81 @@ const [aiResult, setAiResult] = useState("");
     }
   };
 
-  // --- AI Action Handler ---
-  // --- AI Action Handler ---
-// --- AI Action Handler (connected to aiService.js) ---
-const handleAI = async (action) => {
-  if (!editorRef.current) return;
-  const text = editorRef.current.innerText.trim();
-  if (!text) {
-    alert("No content to analyze!");
+// --- Secure Delete Handler ---
+const handleDelete = async () => {
+  if (!note) return;
+
+  // 🚫 Block deletion for locked/encrypted notes
+  if (note.locked || note.encrypted) {
+    alert("🔒 This note is locked. Please unlock it before deleting.");
     return;
   }
 
-  setAiResult("⏳ Thinking...");
+  // ✅ Confirm deletion for unlocked notes
+  if (!window.confirm("Are you sure you want to delete this note?")) return;
+
+  // 🗑️ Proceed with normal deletion
   try {
-    let result = "";
+    const res = await fetch("/.netlify/functions/deleteNote", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ noteId: note.id }),
+    });
 
-    if (action === "summarize") {
-      const res = await summarize(text);
-      result = res.result || res.summary || JSON.stringify(res);
-    } else if (action === "tags") {
-      const res = await suggestTags(text);
-      result = res.result || res.tags?.join(", ") || JSON.stringify(res);
-    } else if (action === "grammar") {
-      const res = await grammarCheck(text);
-      result = res.result || res.corrected || JSON.stringify(res);
-    } else if (action === "glossary") {
-      const res = await glossaryTerms(text);
-      result = res.result || res.glossary || JSON.stringify(res);
+    const data = await res.json();
+    if (res.status === 200) {
+      alert("Note deleted successfully!");
     } else {
-      result = "⚠️ Unknown AI action.";
+      alert(data.error || "Delete failed.");
     }
-
-    setAiResult(result);
-// Duration based on message length (min 5s, max 20s)
-const displayDuration = Math.min(
-  Math.max(result.length * 40, 5000),
-  20000
-);
-setTimeout(() => setAiResult(""), displayDuration);
-  } catch (error) {
-    console.error("AI request failed:", error);
-    setAiResult("⚠️ AI processing failed.");
+  } catch (err) {
+    console.error("Delete request failed:", err);
+    alert("Something went wrong while deleting the note.");
   }
 };
 
 
+  // --- AI Action Handler ---
+  const handleAI = async (action) => {
+    if (!editorRef.current) return;
+    const text = editorRef.current.innerText.trim();
+    if (!text) {
+      alert("No content to analyze!");
+      return;
+    }
+
+    setAiResult("⏳ Thinking...");
+    try {
+      let result = "";
+
+      if (action === "summarize") {
+        const res = await summarize(text);
+        result = res.result || res.summary || JSON.stringify(res);
+      } else if (action === "tags") {
+        const res = await suggestTags(text);
+        result = res.result || res.tags?.join(", ") || JSON.stringify(res);
+      } else if (action === "grammar") {
+        const res = await grammarCheck(text);
+        result = res.result || res.corrected || JSON.stringify(res);
+      } else if (action === "glossary") {
+        const res = await glossaryTerms(text);
+        result = res.result || res.glossary || JSON.stringify(res);
+      } else {
+        result = "⚠️ Unknown AI action.";
+      }
+
+      setAiResult(result);
+      // Duration based on message length (min 5s, max 20s)
+      const displayDuration = Math.min(
+        Math.max(result.length * 40, 5000),
+        20000
+      );
+      setTimeout(() => setAiResult(""), displayDuration);
+    } catch (error) {
+      console.error("AI request failed:", error);
+      setAiResult("⚠️ AI processing failed.");
+    }
+  };
 
   // --- File Export ---
   const downloadFile = async (type) => {
@@ -196,7 +227,11 @@ setTimeout(() => setAiResult(""), displayDuration);
       {/* Header */}
       <div className="editor-header">
         <div className="left">
-          <button className="top-btn" title="Toggle Sidebar" onClick={toggleSidebar}>
+          <button
+            className="top-btn"
+            title="Toggle Sidebar"
+            onClick={toggleSidebar}
+          >
             ☰
           </button>
           <input
@@ -238,26 +273,32 @@ setTimeout(() => setAiResult(""), displayDuration);
 
             {shareOpen && (
               <div className="dropdown-menu">
-                <button onClick={() => downloadFile("pdf")}>Export as PDF</button>
-                <button onClick={() => downloadFile("txt")}>Export as TXT</button>
-                <button onClick={() => downloadFile("docx")}>Export as DOCX</button>
+                <button onClick={() => downloadFile("pdf")}>
+                  Export as PDF
+                </button>
+                <button onClick={() => downloadFile("txt")}>
+                  Export as TXT
+                </button>
+                <button onClick={() => downloadFile("docx")}>
+                  Export as DOCX
+                </button>
               </div>
             )}
           </div>
         </div>
       </div>
 
-      {/* --- Toolbar --- */}
       <Toolbar
-        note={note}
-        applyFormat={applyFormat}
-        encryptNote={handleEncrypt}
-        decryptNote={() => handleDecrypt(password)}
-        deleteNote={deleteNote}
-        runAI={handleAI} 
-      />
+  note={note}
+  applyFormat={applyFormat}
+  encryptNote={handleEncrypt}
+  decryptNote={() => handleDecrypt(password)}
+  deleteNote={() => handleDelete(note.id)}   // ✅ correct form
+  runAI={handleAI}
+/>
 
-      {/* --- Editable Area --- */}
+
+      {/* Editable Area */}
       <div
         ref={editorRef}
         className="note-content"
@@ -269,10 +310,9 @@ setTimeout(() => setAiResult(""), displayDuration);
       <div className="status-bar">
         Words: {wordCount.words} | Chars: {wordCount.chars}
         {aiResult && <div className="ai-popup">{aiResult}</div>}
-
       </div>
 
-      {/* --- Lock Overlay --- */}
+      {/* Lock Overlay */}
       {note.locked && (
         <div className="lock-overlay">
           <div className="lock-box">
